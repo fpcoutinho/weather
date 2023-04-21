@@ -1,18 +1,28 @@
 import "./style.css";
+import Search from "./components/search";
 import { checkEstadoClima } from "./funcoes/tema";
+import { getData } from "./funcoes/api";
 
 const main = document.querySelector("main");
-
-async function getData(location) {
-  const response = await fetch(
-    `http://api.weatherapi.com/v1/current.json?key=6114bfb8a14348b0a38113643232004&q=${location}&aqi=yes`
-  );
-  const data = await response.json();
-  return data;
-}
+const search = Search();
+search.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const location = e.target.querySelector("input").value;
+  getData(location).then((data) => {
+    checkEstadoClima(data.current.is_day, data.current.condition.text);
+    const texto = document.createElement("div");
+    console.log(data);
+    texto.textContent = JSON.stringify(data);
+    main.appendChild(texto);
+  });
+});
+main.appendChild(search);
 
 getData("Cabedelo").then((data) => {
   checkEstadoClima(data.current.is_day, data.current.condition.text);
+
+  const texto = document.createElement("div");
   console.log(data);
-  main.textContent = JSON.stringify(data);
+  texto.textContent = JSON.stringify(data);
+  main.appendChild(texto);
 });
